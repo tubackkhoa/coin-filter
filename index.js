@@ -56,10 +56,10 @@ app.listen(port, async () => {
         data,
         Object.fromEntries(
           await page.$$eval('div.tw-flex-grow', (list) =>
-            list
-              .slice(0, 6)
-              .map((tr) => tr.innerText.trim().split('\n'))
-              .map(([td1, td2]) => [td1.replace(/[ /-]/g, ''), td2.trim()])
+            list.slice(0, 6).map((tr) => {
+              const [td1, td2] = tr.innerText.trim().split('\n');
+              return [td1.replace(/[ /-]/g, ''), td2.trim()];
+            })
           )
         )
       );
