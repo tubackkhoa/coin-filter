@@ -61,6 +61,10 @@ app.listen(port, async () => {
             list
               .slice(0, 6)
               .map((tr) => tr.innerText.trim().split(/\s(?=\$?\d)/))
+              .map((tr) => [
+                tr.querySelector('th').innerText.trim().replace(/[ /-]/g, ''),
+                tr.querySelector('td').innerText.trim()
+              ])
           )
         )
       );
