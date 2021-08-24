@@ -5,6 +5,8 @@ const puppeteer = require('puppeteer');
 const data = { Name: 'Oraichain Token' };
 let running = true;
 
+if (process.env.NODE_ENV === 'production') console.log = () => {};
+
 const delay = (time) =>
   new Promise(function (resolve) {
     setTimeout(resolve, time);
@@ -56,16 +58,15 @@ app.listen(port, async () => {
         data,
         Object.fromEntries(
           await page.$$eval('div.tw-flex-grow', (list) =>
-            list.slice(0, 6).map((tr) => {
-              const [td1, td2] = tr.innerText.trim().split('\n');
-              return [td1.replace(/[ /-]/g, ''), td2.trim()];
-            })
+            list
+              .slice(0, 6)
+              .map((tr) => tr.innerText.trim().split(/\s(?=\$?\d)/))
           )
         )
       );
 
       console.log(data, 'take', Date.now() - start, 'ms');
-      delay(5000);
+      await delay(5000);
       await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
     } catch (ex) {
       console.log(ex.message);
