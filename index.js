@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 let page = null;
 if (process.env.NODE_ENV === 'production') console.log = () => {};
 
-app.get('/:name', (req, res) => {
+app.get('/:name', async (req, res) => {
   const { name } = req.params;
   const data = {
     name: name
@@ -18,7 +18,7 @@ app.get('/:name', (req, res) => {
   const start = Date.now();
 
   try {
-    data.CurrentPrice = await(
+    data.CurrentPrice = await (
       await page.waitForSelector('span.tw-text-3xl')
     ).evaluate((el) => el.innerText.trim());
 
