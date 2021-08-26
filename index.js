@@ -3,6 +3,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 const puppeteer = require('puppeteer');
 
+const userAgent =
+  process.env.AGENT ||
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36';
 let page = null;
 if (process.env.NODE_ENV === 'production') console.log = () => {};
 
@@ -62,6 +65,7 @@ app.listen(port, async () => {
   const args = process.env.PROXY ? [`--proxy-server=${process.env.PROXY}`] : [];
   const browser = await puppeteer.launch({ args });
   page = await browser.newPage();
+  await page.setUserAgent(userAgent);
   console.log('Page is ready');
   page.setRequestInterception(true);
   // ignore images,css,font
