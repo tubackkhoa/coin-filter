@@ -16,6 +16,8 @@ app.get('/', (req, res) => {
   res.json(data);
 });
 
+app.use(express.static('public'));
+
 app.listen(port, async () => {
   console.log(`App listening at port:${port}`);
 
