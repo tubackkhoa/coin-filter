@@ -61,7 +61,7 @@ app.listen(port, async () => {
   console.log(`App listening at port:${port}`);
   const args = process.env.PROXY ? [`--proxy-server=${process.env.PROXY}`] : [];
   const browser = await puppeteer.launch({ args });
-  const page = await browser.newPage();
+  page = await browser.newPage();
   console.log('Page is ready');
   page.setRequestInterception(true);
   // ignore images,css,font
