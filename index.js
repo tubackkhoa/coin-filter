@@ -16,6 +16,7 @@ app.get('/:name', async (req, res) => {
       .replace(/-+/g, ' ')
       .replace(/(?<=^|\s)./g, (m) => m.toUpperCase())
   };
+  if (!page) return res.end();
   await page.goto(`https://www.coingecko.com/en/coins/${name}`);
 
   const start = Date.now();
