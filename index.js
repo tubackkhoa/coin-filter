@@ -56,7 +56,9 @@ app.get('/:name', async (req, res) => {
     console.log('take', Date.now() - start, 'ms');
     res.json(data);
   } catch (ex) {
-    res.end(ex.message);
+    console.log(ex.message);
+    const buffer = await page.screenshot();
+    res.end(buffer, 'binary');
   }
 });
 
