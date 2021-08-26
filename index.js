@@ -8,6 +8,9 @@ if (process.env.NODE_ENV === 'production') console.log = () => {};
 
 app.get('/:name', async (req, res) => {
   const { name } = req.params;
+  if (!name) {
+    res.json({ error: 'Name is empty' });
+  }
   const data = {
     name: name
       .replace(/-+/g, ' ')
