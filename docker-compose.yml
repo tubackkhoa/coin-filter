@@ -8,7 +8,7 @@ services:
         condition: on-failure
         delay: 5s
         max_attempts: 3
-    command: yarn && yarn start
+    command: sh -c 'yarn && yarn start'
     ports:
       - ${PORT}:80
     environment:
