@@ -61,7 +61,8 @@ app.get('/category/:category', async (req, res) => {
 
 app.listen(port, async () => {
   console.log(`App listening at port:${port}`);
-  const args = process.env.PROXY ? [`--proxy-server=${process.env.PROXY}`] : [];
+  const args = ['--no-sandbox', '--disable-setuid-sandbox'];
+  if (process.env.PROXY) args.push(`--proxy-server=${process.env.PROXY}`);
   const browser = await puppeteer.launch({ args });
   page = await browser.newPage();
   await page.setUserAgent(userAgent);
