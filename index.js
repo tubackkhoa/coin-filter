@@ -9,51 +9,48 @@ const userAgent =
 let page = null;
 if (process.env.NODE_ENV === 'production') console.log = () => {};
 
-app.get('/:name', async (req, res) => {
-  const { name } = req.params;
-  if (!name) {
-    res.json({ error: 'Name is empty' });
+app.get('/category/:category', async (req, res) => {
+  const { category } = req.params;
+  const { maxCap = 0 } = req.query;
+  if (!category) {
+    res.json({ error: 'category is empty' });
   }
-  const data = {
-    name: name
-      .replace(/-+/g, ' ')
-      .replace(/(?<=^|\s)./g, (m) => m.toUpperCase())
-  };
-  if (!page) return res.end();
-  await page.goto(`https://www.coingecko.com/en/coins/${name}`);
 
-  const start = Date.now();
+  if (!page) return res.end();
+  await page.goto(`https://www.coingecko.com/en/categories/${category}`);
 
   try {
-    data.CurrentPrice = await (
-      await page.waitForSelector('span.tw-text-3xl')
-    ).evaluate((el) => el.innerText.trim());
-
-    Object.assign(
-      data,
-      Object.fromEntries(
-        await page.$$eval('div.order-3 tr', (list) =>
-          list.map((tr) => [
-            tr.querySelector('th').innerText.trim().replace(/[ /-]/g, ''),
-            tr.querySelector('td').innerText.trim()
-          ])
-        )
+    let data = await (
+      await page.waitForSelector(
+        'table[data-target="gecko-table.table portfolios-v2.table"]'
       )
-    );
+    ).evaluate((table) => {
+      const headers = [...table.querySelectorAll('thead th')]
+        .map((th) => th.innerText.trim())
+        .slice(1, -1);
+      const rows = [...table.querySelectorAll('tbody tr')].map((tr) =>
+        [...tr.querySelectorAll('td')]
+          .map((td) => td.innerText.trim())
+          .slice(1, -1)
+      );
+      const list = [];
+      for (const row of rows) {
+        const item = {};
+        for (const i in row) {
+          item[headers[i]] = row[i];
+        }
+        list.push(item);
+      }
+      return list;
+    });
 
-    Object.assign(
-      data,
-      Object.fromEntries(
-        await page.$$eval('div.tw-flex-grow', (list) =>
-          list.slice(0, 6).map((tr) => {
-            const [td1, td2] = tr.innerText.trim().split(/\s(?=\$?\d)/);
-            return [td1.replace(/[ /-]/g, ''), td2];
-          })
-        )
-      )
-    );
+    if (maxCap) {
+      data = data.filter((item) => {
+        const marketCap = parseInt(item['Mkt Cap'].replace(/[$,]/g, ''));
+        return marketCap < maxCap;
+      });
+    }
 
-    console.log('take', Date.now() - start, 'ms');
     res.json(data);
   } catch (ex) {
     console.log(ex.message);
