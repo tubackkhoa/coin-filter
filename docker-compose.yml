@@ -8,10 +8,11 @@ services:
         condition: on-failure
         delay: 5s
         max_attempts: 3
-    command: yarn && yarn start $PORT
+    command: yarn && yarn start
     ports:
-      - $PORT:80
+      - ${PORT}:80
     environment:
       - PORT=80
+    working_dir: /app
     volumes:
       - ./:/app
